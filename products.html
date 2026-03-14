@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | AMIS Global Exports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background:#f4f9f6; color:#333; line-height: 1.6; }
+
+        /* Navigation */
+        header { background:white; box-shadow:0 3px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .navbar { width:90%; margin:auto; display:flex; justify-content:space-between; align-items:center; padding:15px 0; }
+        .logo img { height:60px; }
+        nav a { margin-left:25px; text-decoration:none; color:#333; font-weight:600; transition: 0.3s; }
+        nav a:hover { color:#0f6b3e; }
+
+        /* Hero */
+        .prod-hero {
+            background: linear-gradient(rgba(15, 107, 62, 0.85), rgba(15, 107, 62, 0.85)), url('herbs.jpg');
+            background-size: cover; background-position: center;
+            padding: 80px 20px; text-align: center; color: white;
+        }
+
+        /* Product Grid */
+        .section { padding: 50px 8%; }
+        .products-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        /* Modern Product Card */
+        .product-card {
+            background: white; border-radius: 15px; overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); transition: 0.4s ease;
+            display: flex; flex-direction: column; position: relative; border: 1px solid #eee;
+        }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+        
+        .badge { position: absolute; top: 15px; right: 15px; background: #0f6b3e; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; z-index: 10; }
+        .origin-tag { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 5px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 10; }
+        
+        .product-card img { width: 100%; height: 230px; object-fit: cover; transition: 0.5s; }
+        .product-card:hover img { scale: 1.05; }
+        
+        .card-content { padding: 20px; flex-grow: 1; }
+        .card-content h3 { color: #0f6b3e; margin-bottom: 10px; font-size: 1.3rem; }
+        .card-content p { font-size: 14px; color: #666; height: 45px; overflow: hidden; }
+        
+        .feature-tag { display: inline-block; background: #eef7f2; color: #0f6b3e; padding: 4px 10px; border-radius: 4px; font-size: 11px; margin: 10px 5px 0 0; font-weight: 600; }
+        
+        /* Interactive Buttons */
+        .btn-group { display: flex; gap: 10px; padding: 0 20px 20px; }
+        .btn { flex: 1; padding: 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; text-align: center; text-decoration: none; transition: 0.3s; }
+        .btn-view { background: #0f6b3e; color: white; }
+        .btn-view:hover { background: #0a4d2c; }
+        .btn-quote { background: #f0fdf4; color: #0f6b3e; border: 1px solid #0f6b3e; }
+        .btn-quote:hover { background: #0f6b3e; color: white; }
+
+        /* Modal / Pop-up */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); }
+        .modal-content {
+            background: white; margin: 2% auto; padding: 40px; width: 90%;
+            max-width: 950px; border-radius: 20px; position: relative; max-height: 92vh; overflow-y: auto;
+        }
+        .close { position: absolute; right: 25px; top: 20px; font-size: 35px; cursor: pointer; color: #999; }
+        .modal-grid { display: grid; grid-template-columns: 1.2fr 1.5fr; gap: 40px; }
+        .modal-info h2 { color: #0f6b3e; font-size: 2rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px; }
+        .modal-info h4 { margin: 20px 0 8px; color: #333; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+        .modal-info ul { padding-left: 20px; font-size: 15px; color: #555; }
+        .spec-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .spec-box { background: #f9f9f9; padding: 15px; border-radius: 10px; border-top: 3px solid #0f6b3e; }
+        .spec-box strong { display: block; font-size: 12px; color: #888; text-transform: uppercase; }
+
+        footer { background:#0f6b3e; color:white; text-align:center; padding:40px; margin-top: 50px; }
+
+        @media(max-width: 768px) { .modal-grid { grid-template-columns: 1fr; } .modal-content { margin: 5% auto; padding: 20px; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="navbar">
+        <div class="logo"><img src="logo.png" alt="AMIS Logo"></div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="products.html" style="color:#0f6b3e;">Products</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<section class="prod-hero">
+    <h1>Global Export Catalog</h1>
+    <p>Premium Ayurvedic Raw Materials & Formulations</p>
+</section>
+
+<section class="section">
+    <div class="products-grid" id="productGrid"></div>
+</section>
+
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="modalData"></div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 AMIS Global Exports | ISO Certified Exporter</p>
+</footer>
+
+<script>
+    const productData = [
+        {
+            id: 1,
+            name: "Turmeric (Haldi)",
+            desc: "Organic turmeric with high curcumin content, sourced from premium Indian farms.",
+            img: "turmeric.png",
+            origin: "India",
+            tags: ["3-5% Curcumin", "Organic Grade A"],
+            benefits: ["Powerful anti-inflammatory", "Rich in curcumin antioxidants", "Supports immune function", "Natural liver detoxifier"],
+            uses: ["Ayurvedic medicine", "Cosmetic applications", "Dietary supplements"],
+            moq: "500kg",
+            packaging: "25kg Organic certified bags",
+            specs: "Moisture: <8% | Heavy Metals: Within limits"
+        },
+        {
+            id: 2,
+            name: "Tulsi (Holy Basil)",
+            desc: "Sacred adaptogenic herb available in dried leaves, powder, and extract forms.",
+            img: "tulsi jpg.jpg",
+            origin: "India",
+            tags: ["Adaptogen", "Premium Organic"],
+            benefits: ["Natural stress reliever", "Supports respiratory health", "Anti-bacterial properties"],
+            uses: ["Herbal tea blends", "Immunity syrups", "Essential oils"],
+            moq: "100kg",
+            packaging: "Vaccum sealed bulk packs",
+            specs: "Purity: 99% | Grade: Export Quality"
+        },
+        {
+            id: 3,
+            name: "Ashwagandha",
+            desc: "The 'King of Herbs' for stress management, physical strength, and vitality.",
+            img: "ashwagandha.png",
+            origin: "India",
+            tags: ["Vitality", "Stress Relief"],
+            benefits: ["Reduces cortisol", "Boosts muscle strength", "Improves sleep quality"],
+            uses: ["Extract capsules", "Protein blends", "Health tonics"],
+            moq: "200kg",
+            packaging: "HDPE Drums / 25kg Bags",
+            specs: "Withanolides: 2.5% - 5%"
+        },
+        {
+            id: 4,
+            name: "Chyavanprash",
+            desc: "Ancient Ayurvedic nutritive jam prepared with 40+ potent herbs.",
+            img: "chavanprash.png",
+            origin: "India",
+            tags: ["Immunity", "Rejuvenator"],
+            benefits: ["Full body rejuvenation", "Respiratory support", "Digestive wellness"],
+            uses: ["Daily health supplement", "General tonic"],
+            moq: "100 Units",
+            packaging: "500g / 1kg PET Jars",
+            specs: "Amla-based | Sugar-free options available"
+        },
+        {
+            id: 5,
+            name: "Triphala",
+            desc: "The classic blend of Amla, Haritaki, and Bibhitaki for detox.",
+            img: "triphala jpg.jpg",
+            origin: "India",
+            tags: ["Detox", "Digestion"],
+            benefits: ["Gentle colon cleanse", "Supports regular bowel movement", "Eye health support"],
+            uses: ["Powder (Churna)", "Tablets", "Extracts"],
+            moq: "150kg",
+            packaging: "Bulk powder bags",
+            specs: "Ratio: 1:1:1 Balanced blend"
+        },
+        {
+            id: 6,
+            name: "Amla (Gooseberry)",
+            desc: "The richest natural source of Vitamin C for immunity and hair health.",
+            img: "amla jpg.jpg",
+            origin: "India",
+            tags: ["Vitamin C", "Hair Care"],
+            benefits: ["Brightens skin", "Boosts immunity", "Prevents hair fall"],
+            uses: ["Juice concentrates", "Dry powder", "Hair oils"],
+            moq: "200kg",
+            packaging: "Food-grade bulk bags",
+            specs: "Cold-dried to retain nutrients"
+        },
+        {
+            id: 7,
+            name: "Herbal Capsules",
+            desc: "Export-ready standardized herbal extracts in vegetarian capsules.",
+            img: "herbal capsules.png",
+            origin: "India",
+            tags: ["Pharma Grade", "Standardized"],
+            benefits: ["Precise dosage", "Easy consumption", "High potency extracts"],
+            uses: ["Modern healthcare", "Supplements"],
+            moq: "5,000 Bottles",
+            packaging: "60/120 Capsule Bottles",
+            specs: "HPMC (Veg) or Gelatin capsules"
+        },
+        {
+            id: 8,
+            name: "Ayurvedic Oils",
+            desc: "Traditional medicated oils for therapeutic massage and healing.",
+            img: "ayurvedic oil 1.png",
+            origin: "India",
+            tags: ["Therapeutic", "Massage"],
+            benefits: ["Joint pain relief", "Skin nourishment", "Stress reduction"],
+            uses: ["Panchakarma", "Spas", "Personal care"],
+            moq: "200 Liters",
+            packaging: "Bulk HDPE cans",
+            specs: "Sesame/Coconut base infusions"
+        },
+        {
+            id: 9,
+            name: "Immunity Booster",
+            desc: "Specialized mixture of 14 natural ingredients for total protection.",
+            img: "immunity booster jpg.jpg",
+            origin: "India",
+            tags: ["Multi-Herb", "Health"],
+            benefits: ["Broad-spectrum immunity", "Anti-viral properties", "General wellness"],
+            uses: ["Daily tablets", "Wellness kits"],
+            moq: "500 Units",
+            packaging: "Premium tablet bottles",
+            specs: "Contains Tulsi, Turmeric, Guduchi"
+        },
+        {
+            id: 10,
+            name: "Avipattikar Churna",
+            desc: "Classical formulation specifically for acidity and digestive comfort.",
+            img: "avipattikar jpg.jpg",
+            origin: "India",
+            tags: ["Acidity Relief", "Digestive"],
+            benefits: ["Balances Pitta dosha", "Cures gastritis", "Relieves heartburn"],
+            uses: ["Post-meal powder", "Digestive aid"],
+            moq: "100kg",
+            packaging: "Bulk powder drums",
+            specs: "Traditional formula"
+        },
+        {
+            id: 11,
+            name: "Brahmi Vati",
+            desc: "Cognitive enhancer for memory, focus, and mental clarity.",
+            img: "brahmi vati jpg.jpg",
+            origin: "India",
+            tags: ["Brain Health", "Memory"],
+            benefits: ["Enhances concentration", "Reduces mental fatigue", "Supports nervous system"],
+            uses: ["Tablets for students/professionals"],
+            moq: "1000 Units",
+            packaging: "30/60 Tablet Packs",
+            specs: "Gold-standard extract"
+        },
+        {
+            id: 12,
+            name: "Dhatupaushtik Churna",
+            desc: "Strength-building powder for physical vigor and muscle mass.",
+            img: "dhatupaushik jpg.jpg",
+            origin: "India",
+            tags: ["Strength", "Body Building"],
+            benefits: ["Increases stamina", "Nutritional support", "Natural weight gain"],
+            uses: ["Fitness supplements", "General weakness"],
+            moq: "100kg",
+            packaging: "500g Packs / Bulk",
+            specs: "Rich in proteins/minerals"
+        }
+    ];
+
+    function renderProducts() {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = productData.map(p => `
+            <div class="product-card">
+                <span class="origin-tag">📍 ${p.origin}</span>
+                <span class="badge">Export Grade</span>
+                <img src="${p.img}" alt="${p.name}" onerror="this.src='herbs.jpg'">
+                <div class="card-content">
+                    <h3>${p.name}</h3>
+                    <p>${p.desc}</p>
+                    <div>${p.tags.map(t => `<span class="feature-tag">${t}</span>`).join('')}</div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-view" onclick="openModal(${p.id})">View Details</button>
+                    <a href="contact.html?product=${p.name}" class="btn btn-quote">Get Quote</a>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openModal(id) {
+        const p = productData.find(item => item.id === id);
+        const modal = document.getElementById('productModal');
+        const content = document.getElementById('modalData');
+        
+        content.innerHTML = `
+            <div class="modal-grid">
+                <img src="${p.img}" style="width:100%; border-radius:15px; box-shadow:0 10px 20px rgba(0,0,0,0.1);" onerror="this.src='herbs.jpg'">
+                <div class="modal-info">
+                    <h2>${p.name}</h2>
+                    <p style="color:#666; font-style:italic;">${p.desc}</p>
+                    
+                    <h4><i class="fas fa-leaf"></i> Health Benefits</h4>
+                    <ul>${p.benefits.map(b => `<li>${b}</li>`).join('')}</ul>
+                    
+                    <h4><i class="fas fa-flask"></i> Commercial Uses</h4>
+                    <ul>${p.uses.map(u => `<li>${u}</li>`).join('')}</ul>
+
+                    <div class="spec-container">
+                        <div class="spec-box">
+                            <strong>Min. Order (MOQ)</strong>
+                            ${p.moq}
+                        </div>
+                        <div class="spec-box">
+                            <strong>Packaging</strong>
+                            ${p.packaging}
+                        </div>
+                    </div>
+                    <p style="margin-top:15px; font-size:13px; color:#444;"><strong>Specs:</strong> ${p.specs}</p>
+                    <br>
+                    <a href="contact.html?product=${p.name}" class="btn btn-view" style="display:block">Inquire for Bulk Export</a>
+                </div>
+            </div>
+        `;
+        modal.style.display = "block";
+    }
+
+    function closeModal() { document.getElementById('productModal').style.display = "none"; }
+    window.onclick = function(event) { if (event.target == document.getElementById('productModal')) closeModal(); }
+
+    renderProducts();
+</script>
+</body>
+</html>
